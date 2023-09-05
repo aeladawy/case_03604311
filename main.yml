@@ -1,0 +1,24 @@
+- name: Deploy the Splunk cluster master
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: "Ensure defined Operating System as of RHEL 8"
+      redhat.satellite.operatingsystem:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        name: "{{ osname }}"
+        os_family: "{{ family }}"
+        major: "{{ item.major }}"
+        minor: "{{ item.minor }}"
+        description: "{{ osname }} {{ item.major }}.{{ item.minor }}"
+        architectures: 
+          - x86_64
+        password_hash: SHA256
+        ptables: "{{ pt }}"
+        provisioning_templates: "{{ pvt_list }}" 
+        parameters: "{{ os_parameters }}" 
+        state: present      
+        validate_certs: no
+     when: item.major != "7"
