@@ -3,6 +3,9 @@
   hosts: all
   gather_facts: false
   tasks:
+    - name: create list of provisioning templates
+      set_fact:
+        pvt_list: "{{ pvt + standard_templates}}"
     - name: "Ensure defined Operating System as of RHEL 8"
       redhat.satellite.operatingsystem:
         username: "{{ satellite_username }}"
