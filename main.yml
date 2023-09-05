@@ -7,6 +7,11 @@
       set_fact:
         pvt_list: "{{ pvt + standard_templates}}"
         
+    - name: create list of OS
+      set_fact:
+        os_list: "{{ os_list | default([]) }} + [ '{{ osname }} {{ item.major }}.{{ item.minor }}' ]"
+      loop: "{{ os }}"
+        
     - name: "Ensure defined Operating System as of RHEL 8"
       redhat.satellite.operatingsystem:
         username: "{{ satellite_username }}"
@@ -27,3 +32,15 @@
         validate_certs: no
       loop: "{{ os }}"
       when: item.major != "7"
+
+    - name: "Assign default provisioning templates to all defined OS"
+      redhat.satellite.provisioning_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        name: "{{ item }}"
+        operatingsystems: "{{ os_list }}"
+        organizations: "{{ org }}"
+        state: present
+        validate_certs: no
+      loop: "{{ pvt }}"
