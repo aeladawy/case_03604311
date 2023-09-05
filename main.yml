@@ -1,6 +1,7 @@
 ---
 - name: satellite operations
-  hosts: all
+  hosts: localhost
+  connection: local
   gather_facts: false
   tasks:
     - name: "Ensure defined Operating System as of RHEL 8"
