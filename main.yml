@@ -1,4 +1,4 @@
-- name: Deploy the Splunk cluster master
+- name: satellite operations
   hosts: localhost
   connection: local
   gather_facts: false
@@ -21,4 +21,4 @@
         parameters: "{{ os_parameters }}" 
         state: present      
         validate_certs: no
-     when: item.major != "7"
+       when: item.major != "7"
