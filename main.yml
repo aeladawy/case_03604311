@@ -1,7 +1,6 @@
 ---
 - name: satellite operations
-  hosts: localhost
-  connection: local
+  hosts: all
   gather_facts: false
   tasks:
     - name: "Ensure defined Operating System as of RHEL 8"
@@ -22,4 +21,5 @@
         parameters: "{{ os_parameters }}" 
         state: present      
         validate_certs: no
+      loop: "{{ os }}"
       when: item.major != "7"
