@@ -1,0 +1,189 @@
+---
+- name: satellite operations
+  hosts: "{{ satellite }}"
+  gather_facts: false
+  vars: 
+    org: "dorganization"
+    osname: "RedHat"
+    family: "Redhat"
+    os: 
+      - { major: '7', minor: '9' }
+      - { major: '8', minor: '7' }
+      - { major: '8', minor: '8' }
+      - { major: '9', minor: '0' }
+      - { major: '9', minor: '1' }
+      - { major: '9', minor: '2' }
+    pvt:
+      - pvt-ipxe_03604311
+      - pvt-provisioning_03604311
+      - pvt-pxelinux_03604311
+    pt: "pt-standard_bios_03604311"  
+    os_parameters:
+      - name: ansible_python_interpreter
+        parameter_type: string
+        value: /usr/libexec/platform-python
+    standard_templates:
+      - Kickstart default finish 
+      - Discovery Red Hat kexec
+      - Kickstart default PXEGrub
+      - Kickstart default PXEGrub2
+      - Kickstart default user data
+  
+    #os_list:
+    #  - 'RedHat 7.9'
+    #  - 'RedHat 8.7'
+    #  - 'RedHat 8.8'
+    #  - 'RedHat 9.0'
+    #  - 'RedHat 9.1'
+    #  - 'RedHat 9.2'
+
+  tasks:
+    - name: create list of provisioning templates
+      set_fact:
+        pvt_list: "{{ pvt + standard_templates}}"
+
+    - name: create list of operating systems
+      set_fact:
+        os_list: "{{ os_list | default([]) }} + [ '{{ osname }} {{ item.major }}.{{ item.minor }}' ]"
+      loop: "{{ os }}"
+        
+    - name: "Ensure defined Operating System as of RHEL 8"
+      redhat.satellite.operatingsystem:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        name: "{{ osname }}"
+        os_family: "{{ family }}"
+        major: "{{ item.major }}"
+        minor: "{{ item.minor }}"
+        description: "{{ osname }} {{ item.major }}.{{ item.minor }}"
+        architectures: 
+          - x86_64
+        password_hash: SHA256
+        ptables: "{{ pt }}"
+        provisioning_templates: "{{ pvt_list }}" 
+        parameters: "{{ os_parameters }}" 
+        state: present      
+        validate_certs: no
+      loop: "{{ os }}"
+      when: item.major != "7"
+
+    #Create Associations
+    - name: "Create Association for iPXE"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "iPXE"
+        provisioning_template: "pvt-ipxe"
+        state: present
+      loop: "{{ os_list }}"
+
+    - name: "Create Association for Provisioning"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "provision"
+        provisioning_template: "pvt-provisioning"
+        state: present
+      loop: "{{ os_list }}"
+
+    - name: "Create Association for PXELinux"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "PXELinux"
+        provisioning_template: "pvt-pxelinux"
+        state: present
+      loop: "{{ os_list }}"
+
+    - name: "Create Association for PXEGrub2"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "PXEGrub2"
+        provisioning_template: "Kickstart default PXEGrub2"
+        state: present
+      loop: "{{ os_list }}"
+      when: item == "RedHat 7.9"
+
+    #Remove Associations
+    - name: "Remove Association for finish"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "finish"
+        state: absent
+      loop: "{{ os_list }}"
+ 
+    - name: "Remove Association for host_init_config"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "host_init_config"
+        state: absent
+      loop: "{{ os_list }}"
+
+    - name: "Remove Association for PXEGrub"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "PXEGrub"
+        state: absent
+      loop: "{{ os_list }}"
+
+    - name: "Remove Association for PXEGrub2"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "PXEGrub2"
+        state: absent
+      loop: "{{ os_list }}"
+      when: item != "RedHat 7.9"
+
+    - name: "Remove Association for user_data"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "user_data"
+        state: absent
+      loop: "{{ os_list }}"
+
+    - name: "Remove Association for kexec"
+      redhat.satellite.os_default_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        operatingsystem: "{{ item }}"
+        template_kind: "kexec"
+        state: absent
+      loop: "{{ os_list }}"
+  
+    - name: "Assign default provisioning templates to all defined OS"
+      redhat.satellite.provisioning_template:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "https://{{ satellite }}"
+        name: "{{ item }}"
+        operatingsystems: "{{ os_list }}"
+        organizations: "{{ org }}"
+        state: present
+        validate_certs: no
+      loop: "{{ pvt }}"
