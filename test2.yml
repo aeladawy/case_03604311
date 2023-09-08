@@ -76,7 +76,7 @@
         server_url: "https://{{ satellite }}"
         operatingsystem: "{{ item }}"
         template_kind: "iPXE"
-        provisioning_template: "pvt-ipxe"
+        provisioning_template: "pvt-ipxe_03604311"
         state: present
       loop: "{{ os_list }}"
 
@@ -87,7 +87,7 @@
         server_url: "https://{{ satellite }}"
         operatingsystem: "{{ item }}"
         template_kind: "provision"
-        provisioning_template: "pvt-provisioning"
+        provisioning_template: "pvt-provisioning_03604311"
         state: present
       loop: "{{ os_list }}"
 
@@ -98,7 +98,7 @@
         server_url: "https://{{ satellite }}"
         operatingsystem: "{{ item }}"
         template_kind: "PXELinux"
-        provisioning_template: "pvt-pxelinux"
+        provisioning_template: "pvt-pxelinux_03604311"
         state: present
       loop: "{{ os_list }}"
 
