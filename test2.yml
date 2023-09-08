@@ -29,23 +29,23 @@
       - Kickstart default PXEGrub2
       - Kickstart default user data
   
-    #os_list:
-    #  - 'RedHat 7.9'
-    #  - 'RedHat 8.7'
-    #  - 'RedHat 8.8'
-    #  - 'RedHat 9.0'
-    #  - 'RedHat 9.1'
-    #  - 'RedHat 9.2'
+    os_list:
+      - 'RedHat 7.9'
+      - 'RedHat 8.7'
+      - 'RedHat 8.8'
+      - 'RedHat 9.0'
+      - 'RedHat 9.1'
+      - 'RedHat 9.2'
 
   tasks:
     - name: create list of provisioning templates
       set_fact:
         pvt_list: "{{ pvt + standard_templates}}"
 
-    - name: create list of operating systems
-      set_fact:
-        os_list: "{{ os_list | default([]) }} + [ '{{ osname }} {{ item.major }}.{{ item.minor }}' ]"
-      loop: "{{ os }}"
+    #- name: create list of operating systems
+    #  set_fact:
+    #    os_list: "{{ os_list | default([]) }} + [ '{{ osname }} {{ item.major }}.{{ item.minor }}' ]"
+    #  loop: "{{ os }}"
         
     - name: "Ensure defined Operating System as of RHEL 8"
       redhat.satellite.operatingsystem:
