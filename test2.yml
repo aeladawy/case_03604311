@@ -80,6 +80,7 @@
         template_kind: "iPXE"
         provisioning_template: "pvt-ipxe_03604311"
         state: present
+        validate_certs: no
       loop: "{{ os_list }}"
 
     - name: "Create Association for Provisioning"
@@ -91,6 +92,7 @@
         template_kind: "provision"
         provisioning_template: "pvt-provisioning_03604311"
         state: present
+        validate_certs: no
       loop: "{{ os_list }}"
 
     - name: "Create Association for PXELinux"
@@ -102,6 +104,7 @@
         template_kind: "PXELinux"
         provisioning_template: "pvt-pxelinux_03604311"
         state: present
+        validate_certs: no
       loop: "{{ os_list }}"
 
     - name: "Create Association for PXEGrub2"
@@ -113,6 +116,7 @@
         template_kind: "PXEGrub2"
         provisioning_template: "Kickstart default PXEGrub2"
         state: present
+        validate_certs: no
       loop: "{{ os_list }}"
       when: item == "RedHat 7.9"
 
@@ -125,6 +129,7 @@
         operatingsystem: "{{ item }}"
         template_kind: "finish"
         state: absent
+        validate_certs: no
       loop: "{{ os_list }}"
  
     - name: "Remove Association for host_init_config"
@@ -135,6 +140,7 @@
         operatingsystem: "{{ item }}"
         template_kind: "host_init_config"
         state: absent
+        validate_certs: no
       loop: "{{ os_list }}"
 
     - name: "Remove Association for PXEGrub"
@@ -145,6 +151,7 @@
         operatingsystem: "{{ item }}"
         template_kind: "PXEGrub"
         state: absent
+        validate_certs: no
       loop: "{{ os_list }}"
 
     - name: "Remove Association for PXEGrub2"
@@ -155,6 +162,7 @@
         operatingsystem: "{{ item }}"
         template_kind: "PXEGrub2"
         state: absent
+        validate_certs: no
       loop: "{{ os_list }}"
       when: item != "RedHat 7.9"
 
@@ -166,6 +174,7 @@
         operatingsystem: "{{ item }}"
         template_kind: "user_data"
         state: absent
+        validate_certs: no
       loop: "{{ os_list }}"
 
     - name: "Remove Association for kexec"
@@ -176,6 +185,7 @@
         operatingsystem: "{{ item }}"
         template_kind: "kexec"
         state: absent
+        validate_certs: no
       loop: "{{ os_list }}"
   
     - name: "Assign default provisioning templates to all defined OS"
