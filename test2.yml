@@ -30,11 +30,11 @@
       - Kickstart default user data
   
     os_list:
-      - 'RedHat 7.9'
-      - 'RedHat 8.7'
-      - 'RedHat 8.8'
-      - 'RedHat 9.0'
-      - 'RedHat 9.1'
+#      - 'RedHat 7.9'
+#      - 'RedHat 8.7'
+#      - 'RedHat 8.8'
+#      - 'RedHat 9.0'
+#      - 'RedHat 9.1'
       - 'RedHat 9.2'
 
   tasks:
