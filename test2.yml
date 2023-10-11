@@ -1,8 +1,8 @@
 ---
 - name: satellite operations
-  #hosts: "{{ satellite }}"
-  hosts: localhost
-  connection: local
+  hosts: "{{ satellite }}"
+  #hosts: localhost
+  #connection: local
   gather_facts: false
   vars: 
     org: "dorganization"
